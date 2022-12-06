@@ -161,7 +161,7 @@ let rec ajouter_bis l tds =
     match l with
     |[] -> []
     |(t,s)::q -> let info_tds = info_to_info_ast (InfoVar (s,Undefined,0,"")) in
-                let v = ajouter tds s info_tds in
+                ajouter tds s info_tds;
                 (t,info_tds)::(ajouter_bis q tds) 
 (* analyse_tds_fonction : tds -> AstSyntax.fonction -> AstTds.fonction *)
 (* Paramètre tds : la table des symboles courante *)
