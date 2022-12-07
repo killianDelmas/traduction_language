@@ -44,13 +44,16 @@ let rec analyse_type_expression e = match e with
 | InfoConst (st,_) -> raise (MauvaiseUtilisationIdentifiant (st))
 | InfoVar(st, _, _, _) -> raise (MauvaiseUtilisationIdentifiant (st)))
 
-let rec analyse_type_instruction oia i =
+let rec analyse_type_instruction i =
   match i with
   | AstTds.Declaration (t, a, e) -> let (e2, t2) = (analyse_type_expression e) in 
-                                      modifier_type_variable t a;
-                                      (if (t = t2) then 
-                                      AstType.Declaration (a, e2)
-                                      else raise (TypeInattendu(t, t2)))
+                                      (if (t2 <> t) then
+                                        raise (TypeInattendu(t2, t))
+                                      else
+                                        (modifier_type_variable t a);
+                                        AstType.Declaration (a, e2))                                      
+                              
+                                      
 
   | AstTds.Affectation (a,e) -> let (e2,t2) = (analyse_type_expression e) in 
                                       modifier_type_variable t2 a;
@@ -62,11 +65,37 @@ let rec analyse_type_instruction oia i =
                           | (e2, Bool) -> AffichageBool e2
                           | _ -> failwith "Erreur de type")
 
-  | AstTds.Conditionnelle (e,b1,b2) -> failwith "Erreur de type"
-  | AstTds.TantQue (c,b) -> failwith "Erreur de type"
-  | _ -> failwith ""
+  | AstTds.Conditionnelle (e,b1,b2) -> let (e2,t2) = analyse_type_expression e in 
+                                      (if (t2 = Bool) then
+                                        AstType.Conditionnelle (e2,(analyse_type_bloc b1),(analyse_type_bloc b2))
+                                      else raise (TypeInattendu (t2,Bool)))
+
+  | AstTds.TantQue (c,b) -> let (e2,t2) = analyse_type_expression c in 
+                            (if (t2 = Bool) then
+                              AstType.TantQue (e2,(analyse_type_bloc b))
+                            else raise (TypeInattendu (t2,Bool)))
+  
       
- (* | AstTds.Retour (e) -> failwith "Erreur de type"
+  | AstTds.Retour (e,i) -> let (e2, t2) = (analyse_type_expression e) in
+                          (match Tds.info_ast_to_info i with
+                          |InfoFun(_,typ,_) -> (if t2 <> typ then
+                                                raise (TypeInattendu (t2, typ))
+                                              else
+                                                AstType.Retour (e2, i))
+                          | _ -> failwith "")
 
-  | AstTds.Empty -> failwith "Erreur de type"*)
+  | AstTds.Empty -> AstType.Empty
+  | _ -> failwith ""
 
+  and analyse_type_bloc li =
+      List.map (analyse_type_instruction) li
+      
+
+(* analyser : AstSyntax.programme -> AstTds.programme *)
+(* Paramètre : le programme à analyser *)
+(* Vérifie la bonne utilisation des identifiants et transforme le programme
+en un programme de type AstTds.programme *)
+(* Erreur si mauvaise utilisation des identifiants *)
+let analyser (AstTds.Programme (fonctions,prog)) =
+  assert(fonctions =[]);
+  AstType.Programme ([],(analyse_type_bloc prog))
