@@ -29,7 +29,8 @@ let analyse_binaire b t1 t2 =
 let rec analyse_type_expression e = match e with
 | AstTds.Booleen b -> (AstType.Booleen b, Bool)
 | AstTds.Entier e -> (AstType.Entier e, Int)
-| AstTds.Unaire (u, e) -> let (ast_type, t) = (analyse_type_expression e) in (AstType.Unaire (analyse_unaire u, ast_type), t)  
+| AstTds.Unaire (u, e) -> let (ast_type, t) = (analyse_type_expression e) in (if t <> Rat then raise (TypeInattendu(t, Rat)) 
+                                                                            else (AstType.Unaire (analyse_unaire u, ast_type), Int)) 
 | AstTds.Binaire (b, e1, e2) -> let (et1, t1) = (analyse_type_expression e1) in
                                 let (et2, t2) = (analyse_type_expression e2) in 
                                 let (bf, tf) = analyse_binaire b t1 t2 in
@@ -38,7 +39,7 @@ let rec analyse_type_expression e = match e with
 | AstTds.Ident s -> (match (info_ast_to_info s) with
                    | InfoConst (_,_) -> (AstType .Ident s, Int) 
                    | InfoVar(_, t, _, _) -> (AstType.Ident s, t)
-                   | InfoFun(_,t,_) -> failwith "pb Tds rat")
+                   | InfoFun(_,_,_) -> failwith "pb Tds rat")
 | AstTds.AppelFonction (s,e_l)-> (match (info_ast_to_info s) with
 | InfoFun(_,t,_) -> (AstType.AppelFonction(s, List.map(fst) (List.map(analyse_type_expression) e_l)), t)
 | InfoConst (st,_) -> raise (MauvaiseUtilisationIdentifiant (st))
@@ -55,9 +56,15 @@ let rec analyse_type_instruction i =
                               
                                       
 
-  | AstTds.Affectation (a,e) -> let (e2,t2) = (analyse_type_expression e) in 
-                                      modifier_type_variable t2 a;
-                                      AstType.Affectation(a, e2)
+  | AstTds.Affectation (a,e) -> let (e2,t2) = (analyse_type_expression e) in
+                                (match info_ast_to_info a with
+                                |InfoVar(_, t, _, _) ->
+                                  (if (t2 <> t) then
+                                    raise (TypeInattendu(t2, t))
+                                   else
+                                    AstType.Affectation(a, e2)) 
+                                |_ -> failwith "")
+                                
       
   | AstTds.Affichage e -> (match analyse_type_expression e with
                           | (e2, Int) -> AffichageInt e2
@@ -90,6 +97,8 @@ let rec analyse_type_instruction i =
   and analyse_type_bloc li =
       List.map (analyse_type_instruction) li
       
+
+
 
 (* analyser : AstSyntax.programme -> AstTds.programme *)
 (* Paramètre : le programme à analyser *)
