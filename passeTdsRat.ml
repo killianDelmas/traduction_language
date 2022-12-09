@@ -157,12 +157,13 @@ and analyse_tds_bloc tds oia li =
    (* afficher_locale tdsbloc ; *) (* décommenter pour afficher la table locale *)
    nli
 
-let rec ajouter_bis l tds =
-    match l with
-    |[] -> []
-    |(t,s)::q -> let info_tds = info_to_info_ast (InfoVar (s,Undefined,0,"")) in
-                ajouter tds s info_tds;
-                (t,info_tds)::(ajouter_bis q tds) 
+
+
+let analyse_tds_parametre tds (t, n) =
+  let ia = info_to_info_ast (InfoVar(n, Undefined, 0, "")) in
+  ajouter tds n ia;
+  (t, ia)
+
 (* analyse_tds_fonction : tds -> AstSyntax.fonction -> AstTds.fonction *)
 (* Paramètre tds : la table des symboles courante *)
 (* Paramètre : la fonction à analyser *)
@@ -172,10 +173,12 @@ en une fonction de type AstTds.fonction *)
 let analyse_tds_fonction maintds (AstSyntax.Fonction(t,n,lp,li))  =
   match chercherLocalement maintds n with
       | Some _-> raise (DoubleDeclaration n )
-      | None -> let tds = creerTDSFille maintds in 
-      let infoFonc = info_to_info_ast (InfoFun (n,t,List.map(fst) lp)) in
-      let lp1 = ajouter_bis lp tds in 
-      AstTds.Fonction (t,infoFonc,lp1 , (analyse_tds_bloc maintds (Some (infoFonc)) li))
+      | None -> let tds = creerTDSFille maintds in
+      let nlp = List.map (analyse_tds_parametre tds) lp in
+      let infoFonc = info_to_info_ast (InfoFun (n,Undefined,[])) in
+      ajouter maintds n infoFonc;
+      let nli = analyse_tds_bloc tds (Some infoFonc) li in
+      AstTds.Fonction (t, infoFonc, nlp, nli)
       
 
                       
