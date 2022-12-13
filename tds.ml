@@ -14,7 +14,7 @@ type info_ast = info ref
 (* Les tables locales sont codées à l'aide d'une hashtable *)
 type tds =
   | Nulle
-  (* Table courante : la table mère - la table courante *)
+  (* Table courante : la table mère - la a table courante *)
   | Courante of tds * (string,info_ast) Hashtbl.t
 
 
