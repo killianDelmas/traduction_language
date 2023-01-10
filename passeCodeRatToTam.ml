@@ -1,10 +1,8 @@
 (* Module de la passe de gestion des identifiants *)
 (* doit être conforme à l'interface Passe *)
 open Tds
-open Exceptions
 open Ast
 open Type
-open AstPlacement
 open Code
 open Tam
 
@@ -15,10 +13,10 @@ type t2 = string
 
 let rec analyse_code_expression e = 
   match e with
-  | AstType.AppelFonction(info, le) -> (match info_ast_to_info info with (*concaténer le code correspondant à chacune des expressions arguments*)
-                                      | InfoFun(n,t,lt) -> (call "ST" n)
+  | AstType.AppelFonction(info, le) -> (String.concat "" (List.map (analyse_code_expression) le)) ^ (*concaténer le code correspondant à chacune des expressions arguments*)
+                                      (match info_ast_to_info info with 
+                                      | InfoFun(n,_,_) -> (call "ST" n)
                                       | _ -> failwith "")
-  (* | AstPlacement.Rationnel (e1, e2) -> (analyse_code_expression e1) ^ (analyse_code_expression e2) *)
   | Unaire (u, e1) -> (match u with
                     | Numerateur -> (analyse_code_expression e1) ^ (pop 0 1)
                     | Denominateur -> (analyse_code_expression e1) ^ (pop 1 1))
@@ -37,8 +35,7 @@ let rec analyse_code_expression e =
                            | Fraction -> call "ST" "norm"
                            | PlusRat -> call "ST" "RAdd"
                            | MultRat -> call "ST" "RMul"
-                           | EquBool -> subr "BEq"
-                           | _ -> failwith "Erreur")
+                           | EquBool -> subr "IEq")
 let rec analyse_code_instruction i =
   match i with
   | AstPlacement.Declaration (a, e) -> (match info_ast_to_info a with
@@ -77,17 +74,14 @@ let rec analyse_code_instruction i =
   | AstPlacement.Retour (e,i1,i2) -> (analyse_code_expression e) ^ (return i1 i2)
 
   | AstPlacement.Empty -> ""
-  | _ -> failwith ""
 
-  and analyse_code_bloc (li,i) = 
-                              let popfinal = (pop 0 i) in
-                              (String.concat "" (List.map analyse_code_instruction li)) ^ popfinal
+
+  and analyse_code_bloc (li,i) = push i ^ (String.concat "" (List.map analyse_code_instruction li)) ^ (pop 0 i)
     
-  
-
-      
-
-
+  let analyse_code_fonction (AstPlacement.Fonction(ia,_,(li,i))) = 
+    match info_ast_to_info ia with
+    | InfoFun(n,_,_) -> label n ^ analyse_code_bloc (li,i) ^ halt
+    | _ -> failwith ""
 
 (* analyser : AstSyntax.programme -> AstTds.programme *)
 (* Paramètre : le programme à analyser *)
@@ -95,5 +89,5 @@ let rec analyse_code_instruction i =
 en un programme de type AstTds.programme *)
 (* Erreur si mauvaise utilisation des identifiants *)
 let analyser (AstPlacement.Programme (fonctions,prog)) =
-  getEntete () ^ (label "main") ^ (analyse_code_bloc prog) ^ halt
+  getEntete () ^ (String.concat "" (List.map (analyse_code_fonction) fonctions)) ^ (label "main") ^ (analyse_code_bloc prog) ^ halt
  

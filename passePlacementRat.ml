@@ -1,17 +1,16 @@
 (* Module de la passe de gestion des identifiants *)
 (* doit être conforme à l'interface Passe *)
 open Tds
-open Exceptions
 open Ast
 open Type
-open AstPlacement
 
 type t1 = Ast.AstType.programme
 type t2 = Ast.AstPlacement.programme
 
 
 
-let rec analyse_placement_expression e = e
+let analyse_placement_expression e = e
+
 let rec analyse_placement_instruction dec reg i =
   match i with
   | AstType.Declaration (a, e) -> (match info_ast_to_info a with
@@ -47,7 +46,6 @@ let rec analyse_placement_instruction dec reg i =
                             | _ -> failwith "a")
 
   | AstType.Empty -> AstPlacement.Empty,0
-  | _ -> failwith ""
 
   and analyse_placement_bloc dec reg li =
     let rec parcours_instr dec l_instr =
