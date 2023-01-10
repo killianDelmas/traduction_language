@@ -163,7 +163,7 @@ let analyse_tds_parametre tds (t, n) =
   match chercherLocalement tds n with
   | Some _ -> raise (DoubleDeclaration n)
   | None ->
-  let ia = info_to_info_ast (InfoVar(n, Undefined, 0, "")) in
+  let ia = info_to_info_ast (InfoVar(n, t, 0, "")) in
   ajouter tds n ia;
   (t, ia)
 
@@ -174,7 +174,7 @@ let analyse_tds_parametre tds (t, n) =
 en une fonction de type AstTds.fonction *)
 (* Erreur si mauvaise utilisation des identifiants *)
 let analyse_tds_fonction maintds (AstSyntax.Fonction(t,n,lp,li))  =
-  match chercherLocalement maintds n with
+  match chercherGlobalement maintds n with
       | Some _-> raise (DoubleDeclaration n )
       | None -> let tds = creerTDSFille maintds in
       let nlp = List.map (analyse_tds_parametre tds) lp in

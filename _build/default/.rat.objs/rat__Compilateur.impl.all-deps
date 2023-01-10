@@ -1,14 +1,10 @@
 Ast
-Code
 Exceptions
 Lexer
 Parser
 Passe
-PasseCodeRatToTam
-PassePlacementRat
 PasseTdsRat
 PasseTypeRat
 Rat
-Tam
 Tds
 Type

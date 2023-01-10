@@ -26,6 +26,9 @@ let analyse_binaire b t1 t2 =
   | (Inf, Int, Int) -> (Inf, Bool)
   | _ -> raise (TypeBinaireInattendu (b,t1,t2))
 
+
+  
+
 let rec analyse_type_expression e = match e with
 | AstTds.Booleen b -> (AstType.Booleen b, Bool)
 | AstTds.Entier e -> (AstType.Entier e, Int)
@@ -41,9 +44,15 @@ let rec analyse_type_expression e = match e with
                    | InfoVar(_, t, _, _) -> (AstType.Ident s, t)
                    | InfoFun(_,_,_) -> failwith "pb Tds rat")
 | AstTds.AppelFonction (s,e_l)-> (match (info_ast_to_info s) with
-| InfoFun(_,t,_) -> (AstType.AppelFonction(s, List.map(fst) (List.map(analyse_type_expression) e_l)), t)
-| InfoConst (st,_) -> raise (MauvaiseUtilisationIdentifiant (st))
-| InfoVar(st, _, _, _) -> raise (MauvaiseUtilisationIdentifiant (st)))
+                                  | InfoFun(_,t,tl) -> let e_l1 = (List.map(analyse_type_expression) e_l) in
+                                    
+                                    if not(est_compatible_list tl (List.map (snd) e_l1 )) then
+                                      raise (TypesParametresInattendus ((List.map (snd) e_l1),tl))
+                                    else 
+                                    (AstType.AppelFonction(s, List.map(fst) e_l1), t)
+                                  | _ -> failwith "")
+
+
 
 let rec analyse_type_instruction i =
   match i with
@@ -96,7 +105,15 @@ let rec analyse_type_instruction i =
 
   and analyse_type_bloc li =
       List.map (analyse_type_instruction) li
-      
+
+
+  let analyse_type_fonction (AstTds.Fonction(t,i,lp,li))  =
+  let lpt = List.map (fst) lp in 
+  modifier_type_fonction t lpt i;
+  let nv_li = analyse_type_bloc li in
+  List.fold_right (fun (tp,pi) _ -> modifier_type_variable (Int) pi) lp ();
+  AstType.Fonction(i,List.map (snd) lp,nv_li)
+  
 
 
 
@@ -106,5 +123,5 @@ let rec analyse_type_instruction i =
 en un programme de type AstTds.programme *)
 (* Erreur si mauvaise utilisation des identifiants *)
 let analyser (AstTds.Programme (fonctions,prog)) =
-  assert(fonctions =[]);
-  AstType.Programme ([],(analyse_type_bloc prog))
+  let n_fonctions = List.map (analyse_type_fonction) fonctions in
+  AstType.Programme (n_fonctions ,(analyse_type_bloc prog))
