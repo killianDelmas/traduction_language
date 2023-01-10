@@ -50,11 +50,21 @@ let rec analyse_placement_instruction dec reg i =
   | _ -> failwith ""
 
   and analyse_placement_bloc dec reg li =
-    match li with
+    let rec parcours_instr dec l_instr =
+      match l_instr with
+      | [] -> [], dec
+      | i::q -> let (instr,size) = analyse_placement_instruction dec reg i in
+                let l,dec = parcours_instr (dec + size) q in 
+                instr :: l, dec in
+                let bloc, nvdec = parcours_instr dec li in 
+                bloc, nvdec - dec
+
+
+    (* match li with
     |[] -> ([],dec)
     |instr::l_instr -> let instr,size = analyse_placement_instruction dec reg instr in
                         let l_instr,dec_li = analyse_placement_bloc (dec+size) reg l_instr in 
-                        (instr::l_instr, dec_li+size) 
+                        (instr::l_instr, dec_li+size)  *)
  
   
 
