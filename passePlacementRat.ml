@@ -41,7 +41,7 @@ let rec analyse_placement_instruction dec reg i =
       
   | AstType.Retour (e,i) -> let e1 = analyse_placement_expression e in
                             (match info_ast_to_info i with
-                            | InfoFun(s, t, l_t) -> let i2 = List.fold_right (fun t q -> (getTaille t) + q) l_t 0 in
+                            | InfoFun(_, t, l_t) -> let i2 = List.fold_right (fun t q -> (getTaille t) + q) l_t 0 in
                                                     let i1 = getTaille t in 
                                                     AstPlacement.Retour (e1,i1, i2),0
                             | _ -> failwith "a")
@@ -59,16 +59,25 @@ let rec analyse_placement_instruction dec reg i =
                 let bloc, nvdec = parcours_instr dec li in 
                 bloc, nvdec - dec
 
-
-    (* match li with
-    |[] -> ([],dec)
-    |instr::l_instr -> let instr,size = analyse_placement_instruction dec reg instr in
-                        let l_instr,dec_li = analyse_placement_bloc (dec+size) reg l_instr in 
-                        (instr::l_instr, dec_li+size)  *)
- 
   
+ let analyse_placement_parametre i dec =
+    match info_ast_to_info i with
+    | InfoVar(_,t,_,_) -> modifier_adresse_variable (dec - (getTaille t)) "LB" i;
+                          getTaille t
+    | _ -> failwith ""
 
-      
+  let rec analyse_placement_parametres lp = 
+    match lp with
+    | [] -> 0
+    | tete::queue -> let taille_q = analyse_placement_parametres queue in
+                    let taille_t = analyse_placement_parametre tete (- taille_q) in 
+                    taille_t + taille_q
+    
+let analyse_placement_fonction (AstType.Fonction(ia,lp,li))  =
+    let _ = analyse_placement_parametres lp in 
+    let nv_bloc = analyse_placement_bloc 3 "LB" li in 
+    AstPlacement.Fonction(ia,lp,nv_bloc)
+    
 
 
 
@@ -78,6 +87,7 @@ let rec analyse_placement_instruction dec reg i =
 en un programme de type AstTds.programme *)
 (* Erreur si mauvaise utilisation des identifiants *)
 let analyser (AstType.Programme (fonctions,prog)) =
-  assert(fonctions =[]);
+  (* assert(fonctions =[]); *)
+  let fs = List.map (analyse_placement_fonction) fonctions in
   let (b,i) = analyse_placement_bloc 0 "SB" prog in
-  AstPlacement.Programme ([],(b,i)) 
+  AstPlacement.Programme (fs,(b,i)) 

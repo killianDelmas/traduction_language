@@ -103,15 +103,16 @@ let rec analyse_type_instruction i =
   | AstTds.Empty -> AstType.Empty
   | _ -> failwith ""
 
+
   and analyse_type_bloc li =
       List.map (analyse_type_instruction) li
+
 
 
   let analyse_type_fonction (AstTds.Fonction(t,i,lp,li))  =
   let lpt = List.map (fst) lp in 
   modifier_type_fonction t lpt i;
   let nv_li = analyse_type_bloc li in
-  List.fold_right (fun (tp,pi) _ -> modifier_type_variable (Int) pi) lp ();
   AstType.Fonction(i,List.map (snd) lp,nv_li)
   
 

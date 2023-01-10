@@ -3,6 +3,7 @@ Exceptions
 Lexer
 Parser
 Passe
+PassePlacementRat
 PasseTdsRat
 PasseTypeRat
 Rat

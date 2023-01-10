@@ -103,8 +103,10 @@ let rec analyse_type_instruction i =
   | AstTds.Empty -> AstType.Empty
   | _ -> failwith ""
 
+
   and analyse_type_bloc li =
       List.map (analyse_type_instruction) li
+
 
 
   let analyse_type_fonction (AstTds.Fonction(t,i,lp,li))  =
