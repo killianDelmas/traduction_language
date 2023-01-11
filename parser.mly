@@ -53,6 +53,7 @@ open Ast.AstSyntax
 %type <expression> e 
 
 (* Type et définition de l'axiome *)
+(* Les règles qui ont des commentaires à coté ont été créés pour l'extension de rat *)
 %start <Ast.AstSyntax.programme> main
 
 %%
@@ -69,29 +70,28 @@ bloc : AO li=i* AF      {li}
 
 i :
 | t=typ n=ID EQUAL e1=e PV          {Declaration (t,n,e1)}
-| n=a EQUAL e1=e PV                 {Affectation (n,e1)}
+| n=a EQUAL e1=e PV                 {Affectation (n,e1)} (* Règle 9 : modifier pour les pointeurs *)
 | CONST n=ID EQUAL e=ENTIER PV      {Constante (n,e)}
 | PRINT e1=e PV                     {Affichage (e1)}
 | IF exp=e li1=bloc ELSE li2=bloc   {Conditionnelle (exp,li1,li2)}
-| IF exp=e li1=bloc                 {CondiSansElse (exp,li1)}
-| WHILE exp=e li=bloc               {TantQue (exp,li)}
+| IF exp=e li1=bloc                 {CondiSansElse (exp,li1)} (* Règle 13 *)
+| WHILE exp=e li=bloc               {TantQue (exp,li)} 
 | RETURN exp=e PV                   {Retour (exp)}
 
 a :
-| n=ID                    {Ident n}
-| PO STAR aa=a PF         {Valeur aa}
+| n=ID                    {Ident n} (* Règle 20 *)
+| PO STAR aa=a PF         {Valeur aa} (* Règle 21 *)
 
 
 typ :
 | BOOL    {Bool}
 | INT     {Int}
 | RAT     {Rat}
-| t=typ STAR {Pointeur t}
+| t=typ STAR {Pointeur t} (* Règle 27 *)
 
 e : 
 | CALL n=ID PO lp=e* PF   {AppelFonction (n,lp)}
 | CO e1=e SLASH e2=e CF   {Binaire(Fraction,e1,e2)}
-// | n=ID                    {Ident n}
 | TRUE                    {Booleen true}
 | FALSE                   {Booleen false}
 | e=ENTIER                {Entier e}
@@ -102,10 +102,10 @@ e :
 | PO e1=e EQUAL e2=e PF   {Binaire (Equ,e1,e2)}
 | PO e1=e INF e2=e PF     {Binaire (Inf,e1,e2)}
 | PO exp=e PF             {exp}
-| PO e1=e POINTI e2=e DOUBLEP e3=e PF {CondTer(e1,e2,e3)}
-| aa=a                     {Affectable aa}
-| NUL                      {Null}
-| PO NEW t=typ PF          {New t}
-| ESPER s=ID               {Adresse s}
+| PO e1=e POINTI e2=e DOUBLEP e3=e PF {CondTer(e1,e2,e3)} (* Règle 42 *)
+| aa=a                     {Affectable aa} (* Règle 43 *)
+| NUL                      {Null} (* Règle 44 *)
+| PO NEW t=typ PF          {New t} (* Règle 45 *)
+| ESPER s=ID               {Adresse s} (* Règle 46 *)
 
 

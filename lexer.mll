@@ -60,10 +60,10 @@ rule token = parse
 | "+"          { PLUS }
 | "*"          { MULT }
 | "<"          { INF }
-| ":"          { DOUBLEP }
-| "?"          { POINTI }
-| "∗"          { STAR }
-| "&"          { ESPER }
+| ":"          { DOUBLEP } (* Pour les conditions sous la forme d'un opérateur *)
+| "?"          { POINTI } (* Pour les conditions sous la forme d'un opérateur *)
+| "∗"          { STAR } (* Etoile pointeur *)
+| "&"          { ESPER } (* pointeur *)
 
 (* constantes entières *)
 | ("-")?['0'-'9']+ as i

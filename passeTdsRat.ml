@@ -7,6 +7,12 @@ open Ast
 type t1 = Ast.AstSyntax.programme
 type t2 = Ast.AstTds.programme
 
+
+(* analyse_tds_expression : tds -> AstSyntax.expression -> AstTds.expression 
+   Paramètre tds : la table des symboles courante 
+ Paramètre a : l'affectable à analyser 
+ Vérifie la bonne utilisation des identifiants et tranforme l'affectable
+en un affectable de type AstTds.affectable *)
 let rec analyse_tds_affectable tds modif (a:AstSyntax.affectable) =
   match a with
   | Ident s ->  (match chercherGlobalement tds s with
@@ -19,6 +25,7 @@ let rec analyse_tds_affectable tds modif (a:AstSyntax.affectable) =
                               | InfoFun _ -> raise (MauvaiseUtilisationIdentifiant s))
                 | None -> raise (IdentifiantNonDeclare s ))
   | Valeur af -> (AstTds.Valeur (analyse_tds_affectable tds true af))
+
 
 (* analyse_tds_expression : tds -> AstSyntax.expression -> AstTds.expression *)
 (* Paramètre tds : la table des symboles courante *)
@@ -142,7 +149,7 @@ let rec analyse_tds_instruction tds oia i =
       end
 
 
-(* analyse_tds_bloc :AstTds.AppelFonction tds -> info_ast option -> AstSyntax.bloc -> AstTds.bloc *)
+(* analyse_tds_bloc :tds -> info_ast option -> AstSyntax.bloc -> AstTds.bloc *)
 (* Paramètre tds : la table des symboles courante *)
 (* Paramètre oia : None si le bloc li est dans le programme principal,
                    Some ia où ia est l'information associée à la fonction dans laquelle est le bloc li sinon *)
@@ -160,7 +167,12 @@ and analyse_tds_bloc tds oia li =
    nli
 
 
-
+(* analyse_tds_parametre: tds -> Type.typ* string -> Type.typ* info_ast *)
+(* Paramètre tds : la table des symboles courante *)
+(* Paramètre : le couple typ,nom à transformer en couple typ,info_ast *)
+(* Vérifie la bonne utilisation d'un paramètre de la fonction et tranforme et
+   ajoute le paramètre dans la tds *)
+(* Erreur si mauvaise utilisation des identifiants *)
 let analyse_tds_parametre tds (t, n) =
   match chercherLocalement tds n with
   | Some _ -> raise (DoubleDeclaration n)

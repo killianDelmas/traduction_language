@@ -19,6 +19,9 @@ let rec type_de_affectable a =
                 | InfoVar(_,ty,_,_) -> ty 
                 | _ -> failwith "")
 
+(* analyse_code_affectable : AstType.affectable -> string
+Paramètre a : l'affectable à analyser *)
+(*Génère le code tam associé *)
 let rec analyse_code_affectable modif deref a = 
   match a with
   | AstType.Valeur af ->  let ty = type_de_affectable af in 
@@ -37,7 +40,9 @@ let rec analyse_code_affectable modif deref a =
                                             store (getTaille(ty)) dep reg 
                   | _ -> failwith "")
 
-
+(* analyse_code_expression : AstPlacement.expression -> string *)
+(* Paramètre i : l'expression à analyser *)
+(*Génère le code tam associé *)
 let rec analyse_code_expression e = 
   match e with
   | AstType.AppelFonction(info, le) -> (*concaténer le code correspondant à chacune des expressions arguments*)
@@ -81,7 +86,10 @@ let rec analyse_code_expression e =
                 | _ -> failwith "")
 | Null -> loadl_int (-1)
 
-
+(* analyse_code_instruction : AstPlacement.instruction -> string *)
+(* Paramètre i : l'instruction à analyser *)
+(*Génère le code tam associé *)
+(*Génère le code tam associé *)
 let rec analyse_code_instruction i =
   match i with
   | AstPlacement.Declaration (a, e) -> (match info_ast_to_info a with
@@ -127,18 +135,22 @@ let rec analyse_code_instruction i =
   | AstPlacement.Empty -> ""
 
 
+  (* analyse_code_bloc : AstPlacement.bloc -> string *)
+(* Paramètre (li,i) : bloc à analyser *)
+(*Génère le code tam associé *)
   and analyse_code_bloc (li,i) =  push i ^(String.concat "" (List.map analyse_code_instruction li)) ^ (pop 0 i) 
-    
+
+(* analyse_code_fonction : AstPlacement.fonction -> string *)
+(* Paramètre : la fonction à analyser *)
+(*Génère le code tam associé *)
   let analyse_code_fonction (AstPlacement.Fonction(ia,_,(li,i))) = 
     match info_ast_to_info ia with
     | InfoFun(n,_,_) -> label n ^ analyse_code_bloc (li,i) ^ halt
     | _ -> failwith ""
 
-(* analyser : AstSyntax.programme -> AstTds.programme *)
+(* analyser : AstType.programme -> AstPlacement.programme *)
 (* Paramètre : le programme à analyser *)
-(* Vérifie la bonne utilisation des identifiants et transforme le programme
-en un programme de type AstTds.programme *)
-(* Erreur si mauvaise utilisation des identifiants *)
+(*Génère le code tam associé *)
 let analyser (AstPlacement.Programme (fonctions,prog)) =
   getEntete () ^ (String.concat "" (List.map (analyse_code_fonction) fonctions)) ^ (label "main") ^ (analyse_code_bloc prog) ^ halt
  

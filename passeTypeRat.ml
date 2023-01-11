@@ -8,13 +8,19 @@ open Type
 type t1 = Ast.AstTds.programme
 type t2 = Ast.AstType.programme
 
-
+(* analyse_unaire : AstSyntax.unaire -> AstType.unaire 
+   Paramètre u : operateur AstSyntax.unaire
+ Transforme l'opérateur unaire en AstType.unaire *)
 let analyse_unaire u =
   match u with
   |AstSyntax.Numerateur -> AstType.Numerateur
   |AstSyntax.Denominateur -> AstType.Denominateur
 
-let analyse_binaire b t1 t2 =
+  (* analyse_unaire : AstSyntax.binaire -> typ -> typ -> AstType.binaire * typ
+   Paramètre b : operateur AstSyntax.binaire
+ Résout la surcharge sur l'opérateur binaire et renvoie le typ de retour de l'opération *)
+(* Erreur si mauvaise utilisation des types *)
+ let analyse_binaire b t1 t2 =
   (match ((b:AstSyntax.binaire), t1, t2) with
   | (Plus, Int, Int) -> (AstType.PlusInt, Int)
   | (Fraction, Int, Int) -> (Fraction, Rat)
@@ -26,7 +32,10 @@ let analyse_binaire b t1 t2 =
   | (Inf, Int, Int) -> (Inf, Bool)
   | _ -> raise (TypeBinaireInattendu (b,t1,t2)))
 
-
+ (* analyse_type_affectable : AstTds.affectable -> AstType.affectable *typ
+Paramètre a : l'affectable à analyser 
+Renvoie le typ de a et tranforme l'affectable
+en un affectable de type AstType.affectable *)
 let rec analyse_type_affectable a =
   match a with
   | AstTds.Valeur af -> (match analyse_type_affectable af with
@@ -37,6 +46,11 @@ let rec analyse_type_affectable a =
                         | InfoVar (_,t,_,_) -> (Ident i, t)
                         | _ -> failwith "")
 
+(* analyse_type_expression : AstTds.expression -> AstType.expression * typ *)
+(* Paramètre e : l'expression à analyser *)
+(* Tranforme l'expression en une expression de type AstType.expression et calcule le
+   typ associé *)
+(* Erreur si mauvaise utilisation des types *)
 let rec analyse_type_expression e = match e with
 | AstTds.Booleen b -> (AstType.Booleen b, Bool)
 | AstTds.Entier e -> (AstType.Entier e, Int)
@@ -71,7 +85,10 @@ let rec analyse_type_expression e = match e with
                 | _ -> failwith "")
 | Null -> (Null, Pointeur Undefined)
 
-
+(* analyse_type_instruction : AstTds.instruction -> AstType.instruction *)
+(* Paramètre i : l'instruction à analyser *)
+(* Tranforme l'instruction en une instruction de type AstType.instruction *)
+(* Erreur si mauvaise utilisation des types *)
 let rec analyse_type_instruction i =
   match i with
   | AstTds.Declaration (t, a, e) -> let (e2, t2) = (analyse_type_expression e) in 
@@ -121,12 +138,18 @@ let rec analyse_type_instruction i =
   | AstTds.Empty -> AstType.Empty
 
 
-
+(* analyse_type_bloc : AstTds.bloc -> AstType.bloc *)
+(* Paramètre li : liste d'instructions à analyser *)
+(* Tranforme le bloc en un bloc de type AstType.bloc *)
+(* Erreur si mauvaise utilisation des types *)
   and analyse_type_bloc li =
       List.map (analyse_type_instruction) li
 
 
-
+(* analyse_type_fonction : AstTds.fonction -> AstType.fonction *)
+(* Paramètre : la fonction à analyser *)
+(* Tranforme la fonction en une fonction de type AstType.fonction *)
+(* Erreur si mauvaise utilisation des types *)
   let analyse_type_fonction (AstTds.Fonction(t,i,lp,li))  =
   let lpt = List.map (fst) lp in 
   modifier_type_fonction t lpt i;
@@ -136,11 +159,10 @@ let rec analyse_type_instruction i =
 
 
 
-(* analyser : AstSyntax.programme -> AstTds.programme *)
+(* analyser : AstTds.programme -> AstType.programme *)
 (* Paramètre : le programme à analyser *)
-(* Vérifie la bonne utilisation des identifiants et transforme le programme
-en un programme de type AstTds.programme *)
-(* Erreur si mauvaise utilisation des identifiants *)
+(* Transforme le programme en un programme de type AstType.programme *)
+(* Erreur si mauvaise utilisation des types *)
 let analyser (AstTds.Programme (fonctions,prog)) =
   let n_fonctions = List.map (analyse_type_fonction) fonctions in
   AstType.Programme (n_fonctions ,(analyse_type_bloc prog))
