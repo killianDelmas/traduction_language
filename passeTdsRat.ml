@@ -7,12 +7,12 @@ open Ast
 type t1 = Ast.AstSyntax.programme
 type t2 = Ast.AstTds.programme
 
-let rec analyse_tds_affectable tds gauche (a:AstSyntax.affectable) =
+let rec analyse_tds_affectable tds modif (a:AstSyntax.affectable) =
   match a with
   | Ident s ->  (match chercherGlobalement tds s with
                 | Some i -> (match info_ast_to_info i with
                               | InfoVar _ -> AstTds.Ident i
-                              | InfoConst _ -> if gauche then 
+                              | InfoConst _ -> if modif then 
                                                   raise (MauvaiseUtilisationIdentifiant s) 
                                                else
                                                   AstTds.Ident i

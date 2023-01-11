@@ -1,4 +1,4 @@
-; ./tests/tam/sans_fonction/fichiersRat/testif1.rat
+; ./tests/tam/sans_fonction/fichiersRat/pointeur2.rat
 JUMP main
 
 pgcd
@@ -71,24 +71,23 @@ CALL (ST) norm
 RETURN (2) 4
 
 main
+PUSH 3
 PUSH 1
 LOADL 1
+SUBR MAlloc
 STORE (1) 0[SB]
-PUSH 1
-LOADL 1
-STORE (1) 1[SB]
+LOADL 3
 LOAD (1) 0[SB]
-LOAD (1) 1[SB]
-SUBR IEq
-JUMPIF (0) label1
+STOREI (1)
+PUSH 1
 LOADL 18
-SUBR IOut
-POP (0) 2
-JUMP label2
-label1
-LOADL 21
-SUBR IOut
-POP (0) 2
-label2
-POP (0) 4
+STORE (1) 1[SB]
+PUSH 1
+LOADA 1[SB]
+STORE (1) 2[SB]
+LOAD (1) 0[SB]
+LOADI (1)
+LOAD (1) 2[SB]
+STOREI (1)
+POP (0) 3
 HALT

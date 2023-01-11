@@ -97,3 +97,8 @@ let%expect_test "condTer" =
   runtam (pathFichiersRat^"condTer.rat");
   [%expect{| true |}]
 
+let%expect_test "pointeur" =
+  runtam (pathFichiersRat^"pointeur.rat");
+  [%expect{| 423 |}]
+
+
