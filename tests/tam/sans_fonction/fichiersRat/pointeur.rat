@@ -1,0 +1,9 @@
+main{
+int ∗ px = (new int);
+(∗ px) = 42;
+print (∗px);
+int x = 3;
+px = &x;
+int y = (∗px);
+print y;
+}

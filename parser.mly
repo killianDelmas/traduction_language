@@ -18,6 +18,8 @@ open Ast.AstSyntax
 %token EQUAL
 %token CONST
 %token PRINT
+%token NUL
+%token NEW
 %token IF
 %token ELSE
 %token WHILE
@@ -36,6 +38,8 @@ open Ast.AstSyntax
 %token MULT
 %token DOUBLEP
 %token POINTI
+%token STAR
+%token ESPER
 %token INF
 %token EOF
 
@@ -65,7 +69,7 @@ bloc : AO li=i* AF      {li}
 
 i :
 | t=typ n=ID EQUAL e1=e PV          {Declaration (t,n,e1)}
-| n=ID EQUAL e1=e PV                {Affectation (n,e1)}
+| n=a EQUAL e1=e PV                 {Affectation (n,e1)}
 | CONST n=ID EQUAL e=ENTIER PV      {Constante (n,e)}
 | PRINT e1=e PV                     {Affichage (e1)}
 | IF exp=e li1=bloc ELSE li2=bloc   {Conditionnelle (exp,li1,li2)}
@@ -73,16 +77,21 @@ i :
 | WHILE exp=e li=bloc               {TantQue (exp,li)}
 | RETURN exp=e PV                   {Retour (exp)}
 
+a :
+| n=ID                    {Ident n}
+| PO STAR aa=a PF         {Valeur aa}
+
 
 typ :
 | BOOL    {Bool}
 | INT     {Int}
 | RAT     {Rat}
+| t=typ STAR {Pointeur t}
 
 e : 
 | CALL n=ID PO lp=e* PF   {AppelFonction (n,lp)}
 | CO e1=e SLASH e2=e CF   {Binaire(Fraction,e1,e2)}
-| n=ID                    {Ident n}
+// | n=ID                    {Ident n}
 | TRUE                    {Booleen true}
 | FALSE                   {Booleen false}
 | e=ENTIER                {Entier e}
@@ -94,5 +103,9 @@ e :
 | PO e1=e INF e2=e PF     {Binaire (Inf,e1,e2)}
 | PO exp=e PF             {exp}
 | PO e1=e POINTI e2=e DOUBLEP e3=e PF {CondTer(e1,e2,e3)}
+| aa=a                     {Affectable aa}
+| NUL                      {Null}
+| PO NEW t=typ PF          {New t}
+| ESPER s=ID               {Adresse s}
 
 
