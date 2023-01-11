@@ -119,6 +119,13 @@ let rec analyse_tds_instruction tds oia i =
       let east = analyse_tds_bloc tds oia e in
       (* Renvoie la nouvelle structure de la conditionnelle *)
       AstTds.Conditionnelle (nc, tast, east)
+  | AstSyntax.CondiSansElse (c,t) ->
+    (* Analyse de la condition *)
+    let nc = analyse_tds_expression tds c in
+    (* Analyse du bloc then *)
+    let tast = analyse_tds_bloc tds oia t in
+    (* Renvoie la nouvelle structure de la conditionnelle *)
+    AstTds.CondiSansElse(nc, tast)
   | AstSyntax.TantQue (c,b) ->
       (* Analyse de la condition *)
       let nc = analyse_tds_expression tds c in

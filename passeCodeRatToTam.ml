@@ -64,6 +64,13 @@ let rec analyse_code_instruction i =
                                                 ^ (analyse_code_bloc b2) 
                                               ^ (label l_fin_else) 
 
+  | AstPlacement.CondiSansElse (e,b) -> 
+                                        let l_fin_sans_else = getEtiquette() in 
+                                          (analyse_code_expression e) 
+                                          ^ (jumpif 0 l_fin_sans_else)
+                                          ^ (analyse_code_bloc b)
+                                        ^ (label l_fin_sans_else) 
+
   | AstPlacement.TantQue (e,b) -> let l_debut = getEtiquette() in 
                                     let l_fin = getEtiquette() in 
                                     (label l_debut) 

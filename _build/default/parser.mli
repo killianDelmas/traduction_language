@@ -9,6 +9,7 @@ type token =
   | RAT
   | PV
   | PRINT
+  | POINTI
   | PO
   | PLUS
   | PF
@@ -23,6 +24,7 @@ type token =
   | EOF
   | ENTIER of (int)
   | ELSE
+  | DOUBLEP
   | DENOM
   | CONST
   | CO

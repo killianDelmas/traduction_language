@@ -50,6 +50,8 @@ and instruction =
   | Affichage of expression
   (* Conditionnelle représentée par la condition, le bloc then et le bloc else *)
   | Conditionnelle of expression * bloc * bloc
+  (* Conditionnelle représentée par la condition, le bloc then et pas de bloc else *)
+  | CondiSansElse of expression * bloc
   (*Boucle TantQue représentée par la conditin d'arrêt de la boucle et le bloc d'instructions *)
   | TantQue of expression * bloc
   (* return d'une fonction *)
@@ -93,6 +95,7 @@ struct
     | Affectation of  Tds.info_ast * expression (* le nom de l'identifiant est remplacé par ses informations *)
     | Affichage of expression
     | Conditionnelle of expression * bloc * bloc
+    | CondiSansElse of expression * bloc
     | TantQue of expression * bloc
     | Retour of expression * Tds.info_ast  (* les informations sur la fonction à laquelle est associé le retour *)
     | Empty (* les nœuds ayant disparus: Const *)
@@ -141,6 +144,7 @@ type bloc = instruction list
   | AffichageRat of expression
   | AffichageBool of expression
   | Conditionnelle of expression * bloc * bloc
+  | CondiSansElse of expression * bloc
   | TantQue of expression * bloc
   | Retour of expression * Tds.info_ast
   | Empty (* les nœuds ayant disparus: Const *)
@@ -172,6 +176,7 @@ type bloc = instruction list * int (* taille du bloc *)
  | AffichageRat of expression
  | AffichageBool of expression
  | Conditionnelle of expression * bloc * bloc
+ | CondiSansElse of expression * bloc
  | TantQue of expression * bloc
  | Retour of expression * int * int (* taille du retour et taille des paramètres *)
  | Empty (* les nœuds ayant disparus: Const *)

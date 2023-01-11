@@ -33,6 +33,9 @@ let rec analyse_placement_instruction dec reg i =
                                         let (b11) = analyse_placement_bloc dec reg b1 in
                                         let (b21) = analyse_placement_bloc dec reg b2 in 
                                         AstPlacement.Conditionnelle (e1, b11, b21), 0
+  | AstType.CondiSansElse (e,b) -> let e1 = analyse_placement_expression e in 
+                                        let (b1) = analyse_placement_bloc dec reg b in
+                                        AstPlacement.CondiSansElse(e1, b1), 0
 
   | AstType.TantQue (e,b) -> let e1 = analyse_placement_expression e in
                               let b1 = analyse_placement_bloc dec reg b in 

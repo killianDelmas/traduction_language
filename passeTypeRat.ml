@@ -85,6 +85,10 @@ let rec analyse_type_instruction i =
                                       (if (t2 = Bool) then
                                         AstType.Conditionnelle (e2,(analyse_type_bloc b1),(analyse_type_bloc b2))
                                       else raise (TypeInattendu (t2,Bool)))
+  | AstTds.CondiSansElse (e,b) -> let (e2,t2) = analyse_type_expression e in 
+                                      (if (t2 = Bool) then
+                                        AstType.CondiSansElse (e2,(analyse_type_bloc b))
+                                      else raise (TypeInattendu (t2,Bool)))
 
   | AstTds.TantQue (c,b) -> let (e2,t2) = analyse_type_expression c in 
                             (if (t2 = Bool) then
@@ -101,7 +105,7 @@ let rec analyse_type_instruction i =
                           | _ -> failwith "")
 
   | AstTds.Empty -> AstType.Empty
-  | _ -> failwith ""
+
 
 
   and analyse_type_bloc li =

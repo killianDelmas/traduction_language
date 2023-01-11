@@ -34,6 +34,8 @@ open Ast.AstSyntax
 %token FALSE
 %token PLUS
 %token MULT
+%token DOUBLEP
+%token POINTI
 %token INF
 %token EOF
 
@@ -67,8 +69,10 @@ i :
 | CONST n=ID EQUAL e=ENTIER PV      {Constante (n,e)}
 | PRINT e1=e PV                     {Affichage (e1)}
 | IF exp=e li1=bloc ELSE li2=bloc   {Conditionnelle (exp,li1,li2)}
+| IF exp=e li1=bloc                 {CondiSansElse (exp,li1)}
 | WHILE exp=e li=bloc               {TantQue (exp,li)}
 | RETURN exp=e PV                   {Retour (exp)}
+
 
 typ :
 | BOOL    {Bool}
@@ -89,5 +93,6 @@ e :
 | PO e1=e EQUAL e2=e PF   {Binaire (Equ,e1,e2)}
 | PO e1=e INF e2=e PF     {Binaire (Inf,e1,e2)}
 | PO exp=e PF             {exp}
+// | PO e1=e POINTI e2=e DOUBLEP e3=e {}
 
 
