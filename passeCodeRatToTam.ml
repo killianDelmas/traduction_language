@@ -36,6 +36,15 @@ let rec analyse_code_expression e =
                            | PlusRat -> call "ST" "RAdd"
                            | MultRat -> call "ST" "RMul"
                            | EquBool -> subr "IEq")
+| CondTer(c,t,e) -> let fin_cond_ter = getEtiquette() in 
+                    let else_cond_ter = getEtiquette() in 
+                    (analyse_code_expression c) ^
+                    (jumpif 0 else_cond_ter) ^
+                    (analyse_code_expression t) ^
+                    (jump fin_cond_ter) ^
+                    (label else_cond_ter) ^
+                    (analyse_code_expression e) ^
+                    (label fin_cond_ter)
 let rec analyse_code_instruction i =
   match i with
   | AstPlacement.Declaration (a, e) -> (match info_ast_to_info a with

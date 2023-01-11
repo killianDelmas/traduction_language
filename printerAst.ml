@@ -64,6 +64,7 @@ struct
           | Fraction -> "["^(string_of_expression e1)^"/"^(string_of_expression e2)^"] "
           | _ -> (string_of_expression e1)^(string_of_binaire b)^(string_of_expression e2)^" "
         end
+    | CondTer(c,t,e) -> "("^(string_of_expression c)^"?"^(string_of_expression t)^":"^(string_of_expression e)^")"^"\n"
 
   (* Conversion des instructions *)
   let rec string_of_instruction i =

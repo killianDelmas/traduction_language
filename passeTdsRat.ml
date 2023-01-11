@@ -29,6 +29,7 @@ let rec analyse_tds_expression tds e = match e with
                                                 | InfoFun _ -> AstTds.AppelFonction (i, List.map( analyse_tds_expression tds) e_l)
                                                 | _ -> raise (MauvaiseUtilisationIdentifiant s))
                                     | None -> raise (IdentifiantNonDeclare s ))
+| AstSyntax.CondTer (e1,e2,e3) -> AstTds.CondTer((analyse_tds_expression tds e1),(analyse_tds_expression tds e2),(analyse_tds_expression tds e3))
 
 
 

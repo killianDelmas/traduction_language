@@ -51,6 +51,16 @@ let rec analyse_type_expression e = match e with
                                     else 
                                     (AstType.AppelFonction(s, List.map(fst) e_l1), t)
                                   | _ -> failwith "")
+| AstTds.CondTer(c,t,e) -> let (c1,tc) = analyse_type_expression c in 
+                          let (t1,tt) = analyse_type_expression t in 
+                          let (e1,te) = analyse_type_expression e in 
+                          if (est_compatible tt te) then
+                            if tc =Bool then
+                              (AstType.CondTer(c1,t1,e1),tt)
+                            else 
+                              raise (TypeInattendu(tc,Bool))
+                          else raise (TypeInattendu(tt,te))
+
 
 
 

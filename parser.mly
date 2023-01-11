@@ -93,6 +93,6 @@ e :
 | PO e1=e EQUAL e2=e PF   {Binaire (Equ,e1,e2)}
 | PO e1=e INF e2=e PF     {Binaire (Inf,e1,e2)}
 | PO exp=e PF             {exp}
-// | PO e1=e POINTI e2=e DOUBLEP e3=e {}
+| PO e1=e POINTI e2=e DOUBLEP e3=e PF {CondTer(e1,e2,e3)}
 
 
