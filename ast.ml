@@ -86,9 +86,10 @@ end
 module AstTds =
 struct
 
-  type affectable =
-  | Ident of Tds.info_ast
-  | Valeur of affectable
+
+type affectable =
+| Ident of Tds.info_ast
+| Valeur of affectable
 
   (* Expressions existantes dans notre langage *)
   (* ~ expression de l'AST syntaxique où les noms des identifiants ont été
@@ -105,6 +106,8 @@ struct
     | Null
     | New of typ
     | Adresse of Tds.info_ast
+
+  
 
   (* instructions existantes dans notre langage *)
   (* ~ instruction de l'AST syntaxique où les noms des identifiants ont été
@@ -144,16 +147,24 @@ type unaire = Numerateur | Denominateur
 (* Opérateurs binaires existants dans Rat - résolution de la surcharge *)
 type binaire = Fraction | PlusInt | PlusRat | MultInt | MultRat | EquInt | EquBool | Inf
 
+type affectable =
+| Ident of Tds.info_ast
+| Valeur of affectable
+
 (* Expressions existantes dans Rat *)
 (* = expression de AstTds *)
 type expression =
   | AppelFonction of Tds.info_ast * expression list
-  | Ident of Tds.info_ast
   | Booleen of bool
   | Entier of int
   | Unaire of unaire * expression
   | Binaire of binaire * expression * expression
   | CondTer of expression * expression * expression
+  | Affectable of affectable
+  | Null
+  | New of typ
+  | Adresse of Tds.info_ast
+  
 
 (* instructions existantes Rat *)
 (* = instruction de AstTds + informations associées aux identificateurs, mises à jour *)
@@ -161,7 +172,7 @@ type expression =
 type bloc = instruction list
  and instruction =
   | Declaration of Tds.info_ast * expression
-  | Affectation of Tds.info_ast * expression
+  | Affectation of affectable * expression
   | AffichageInt of expression
   | AffichageRat of expression
   | AffichageBool of expression

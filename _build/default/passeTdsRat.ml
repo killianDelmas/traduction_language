@@ -18,7 +18,7 @@ let rec analyse_tds_affectable tds gauche (a:AstSyntax.affectable) =
                                                   AstTds.Ident i
                               | InfoFun _ -> raise (MauvaiseUtilisationIdentifiant s))
                 | None -> raise (IdentifiantNonDeclare s ))
-  | Valeur af -> (Valeur (analyse_tds_affectable tds true af))
+  | Valeur af -> (AstTds.Valeur (analyse_tds_affectable tds true af))
 
 (* analyse_tds_expression : tds -> AstSyntax.expression -> AstTds.expression *)
 (* Paramètre tds : la table des symboles courante *)
