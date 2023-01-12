@@ -11,7 +11,7 @@ type t2 = Ast.AstTds.programme
 (* analyse_tds_expression : tds -> AstSyntax.expression -> AstTds.expression 
    Paramètre tds : la table des symboles courante 
  Paramètre a : l'affectable à analyser 
- Vérifie la bonne utilisation des identifiants et tranforme l'affectable
+ Vérifie la bonne utilisation des identifiants et transforme l'affectable
 en un affectable de type AstTds.affectable *)
 let rec analyse_tds_affectable tds modif (a:AstSyntax.affectable) =
   match a with
